@@ -1,0 +1,16 @@
+stages:
+  - build
+  - deploy
+    
+mvn-build:
+    stage: build
+    script:
+    - mvn clean install
+    - export DOCKER_HOST="tcp://0.0.0.0:2375"
+    - docker build -t calib-parser .
+    - docker ps -q --filter "name=calib-parser" | grep -q . && docker rm -f calib-parser
+    - docker run --name calib-parser -p 8081:8081 -d -t calib-parser
+    only:
+    - master
+
+
